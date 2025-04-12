@@ -3,26 +3,29 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>اختبار الفصل الثاني - الرأي العام (46 سؤال)</title>
+  <title>اختبار الفصل الثاني - الرأي العام (45 سؤال)</title>
   <style>
     body { font-family: 'Arial', sans-serif; direction: rtl; background: #f8f8f8; padding: 20px; }
     .quiz-container { background: #fff; border-radius: 10px; padding: 20px; max-width: 900px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h2 { text-align: center; }
-    .question { margin: 25px 0; }
-    .question span { font-weight: bold; }
+    .question { margin: 25px 0; padding: 10px; border-bottom: 1px solid #ddd; }
+    .question span { font-weight: bold; display: block; margin-bottom: 8px; }
+    .correct-answer { color: green; font-weight: bold; }
+    .wrong-answer { color: red; font-weight: bold; }
     button { padding: 10px 20px; margin-top: 20px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    .retry { background: #e74c3c !important; }
     .result { margin-top: 30px; font-weight: bold; font-size: 18px; text-align: center; }
   </style>
 </head>
 <body>
 <div class="quiz-container">
-  <h2>اختبار الفصل الثاني - الرأي العام (46 سؤال)</h2>
+  <h2>اختبار الفصل الثاني - الرأي العام (45 سؤال)</h2>
   <form id="quizForm"></form>
-  <button onclick="submitQuiz()">تحقق من الإجابات</button>
+  <button type="button" onclick="submitQuiz()">تحقق من الإجابات</button>
   <div class="result" id="result"></div>
 </div>
 <script>
-const questions =
+ const questions =
 [
   {
     "text": "يُعد الإعلام من المصادر المؤثرة في تشكيل الرأي العام.",
@@ -411,9 +414,11 @@ const questions =
 ]
 ;
 const quizForm = document.getElementById("quizForm");
+
 questions.forEach((q, index) => {
   const div = document.createElement("div");
   div.className = "question";
+  div.id = "question" + index;
   let html = `<span>(${index + 1}) ${q.text}</span><br>`;
   q.options.forEach(opt => {
     html += `<input type="radio" name="q${index}" value="${opt}"> ${opt} `;
@@ -421,15 +426,32 @@ questions.forEach((q, index) => {
   div.innerHTML = html;
   quizForm.appendChild(div);
 });
+
 function submitQuiz() {
   let score = 0;
   questions.forEach((q, index) => {
     const selected = document.querySelector(`input[name=q${index}]:checked`);
-    if (selected && selected.value === q.correct) {
+    const questionDiv = document.getElementById("question" + index);
+    const userAnswer = selected ? selected.value : "❌ لم يتم الاختيار";
+    const correctAnswer = q.correct;
+
+    if (userAnswer === correctAnswer) {
       score++;
+      questionDiv.innerHTML += `<div class='correct-answer'>✅ إجابتك صحيحة: ${userAnswer}</div>`;
+    } else {
+      questionDiv.innerHTML += `<div class='wrong-answer'>❌ إجابتك: ${userAnswer}<br>✅ الإجابة الصحيحة: ${correctAnswer}</div>`;
     }
   });
-  document.getElementById("result").textContent = `✅ نتيجتك: ${score} من ${questions.length}`;
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = `✅ نتيجتك: ${score} من ${questions.length}`;
+  resultDiv.scrollIntoView({ behavior: "smooth" });
+
+  const retryBtn = document.createElement("button");
+  retryBtn.textContent = "🔄 إعادة المحاولة";
+  retryBtn.className = "retry";
+  retryBtn.onclick = () => location.reload();
+  document.querySelector(".quiz-container").appendChild(retryBtn);
 }
 </script>
 </body>
